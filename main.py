@@ -1,69 +1,78 @@
-# Import necessary modules
+# Import required libraries
 import os, csv
 from pathlib import Path 
 
-# Define the file path using pathlib
-data_file = Path("Resources","budget_data.csv")
+# Set the path for the CSV file using pathlib
+csv_file_path = Path("Resources", "election_data.csv")
 
-# Initialize empty lists for processing data
-months = []
-profits = []
-profit_changes = []
- 
+# Initialize vote counters for each candidate
+total_votes = 0 
+votes_stockham = 0
+votes_degette = 0
+votes_doane = 0
+
 # Open the CSV file in read mode
-with open(data_file, newline="", encoding="utf-8") as file:
+with open(csv_file_path, newline="", encoding="utf-8") as election_data:
 
-    # Read the content of the CSV file
-    csv_reader = csv.reader(file, delimiter=",") 
+    # Read the CSV file contents
+    csv_reader = csv.reader(election_data, delimiter=",") 
 
     # Skip the header row
-    header = next(csv_reader)  
+    header = next(csv_reader)     
 
-    # Loop through each row in the CSV file
+    # Process each row in the CSV file
     for row in csv_reader: 
 
-        # Append month and profit data to their respective lists
-        months.append(row[0])
-        profits.append(int(row[1]))
+        # Increment the total vote count
+        total_votes += 1
 
-    # Calculate monthly changes in profit
-    for i in range(len(profits)-1):
-        
-        # Compute the change and add to the list
-        profit_changes.append(profits[i+1] - profits[i])
-        
-# Determine the maximum and minimum profit changes
-max_profit_increase = max(profit_changes)
-max_profit_decrease = min(profit_changes)
+        # Tally votes for each candidate
+        if row[2] == "Charles Casper Stockham": 
+            votes_stockham += 1
+        elif row[2] == "Diana DeGette":
+            votes_degette += 1
+        elif row[2] == "Raymon Anthony Doane": 
+            votes_doane += 1
 
-# Find the corresponding months for max and min changes
-max_profit_month = profit_changes.index(max_profit_increase) + 1
-min_profit_month = profit_changes.index(max_profit_decrease) + 1 
+# Create a dictionary to store the candidates and their corresponding vote counts
+candidates = ["Charles Casper Stockham", "Diana DeGette", "Raymon Anthony Doane"]
+votes = [votes_stockham, votes_degette, votes_doane]
 
-# Print the financial analysis summary
-print("Financial Analysis")
-print("----------------------------")
-print(f"Total Months: {len(months)}")
-print(f"Total: ${sum(profits)}")
-print(f"Average Change: ${round(sum(profit_changes)/len(profit_changes),2)}")
-print(f"Greatest Increase in Profits: {months[max_profit_month]} (${(str(max_profit_increase))})")
-print(f"Greatest Decrease in Profits: {months[min_profit_month]} (${(str(max_profit_decrease))})")
+# Combine the candidate names and their vote counts into a dictionary
+vote_counts = dict(zip(candidates, votes))
 
-# Define the output file path
-output_summary = Path("analysis","Summary.txt")
+# Determine the winner by finding the candidate with the maximum votes
+winner = max(vote_counts, key=vote_counts.get)
 
-# Write the summary to the output file
-with open(output_summary, "w") as summary_file:
-    summary_file.write("Financial Analysis")
-    summary_file.write("\n")
-    summary_file.write("----------------------------")
-    summary_file.write("\n")
-    summary_file.write(f"Total Months: {len(months)}")
-    summary_file.write("\n")
-    summary_file.write(f"Total: ${sum(profits)}")
-    summary_file.write("\n")
-    summary_file.write(f"Average Change: ${round(sum(profit_changes)/len(profit_changes),2)}")
-    summary_file.write("\n")
-    summary_file.write(f"Greatest Increase in Profits: {months[max_profit_month]} (${(str(max_profit_increase))})")
-    summary_file.write("\n")
-    summary_file.write(f"Greatest Decrease in Profits: {months[min_profit_month]} (${(str(max_profit_decrease))})")
+# Calculate the percentage of votes for each candidate
+percent_stockham = (votes_stockham / total_votes) * 100
+percent_degette = (votes_degette / total_votes) * 100
+percent_doane = (votes_doane / total_votes) * 100
+
+# Print the election results summary
+print(f"Election Results")
+print(f"----------------------------")
+print(f"Total Votes: {total_votes}")
+print(f"----------------------------")
+print(f"Charles Casper Stockham: {percent_stockham:.3f}% ({votes_stockham})")
+print(f"Diana DeGette: {percent_degette:.3f}% ({votes_degette})")
+print(f"Raymon Anthony Doane: {percent_doane:.3f}% ({votes_doane})")
+print(f"----------------------------")
+print(f"Winner: {winner}")
+print(f"----------------------------")
+
+# Define the path for the output file using pathlib
+output_file_path = Path("analysis", "Summary.txt")
+
+# Write the election results summary to the output file
+with open(output_file_path, "w") as file:
+    file.write(f"Election Results\n")
+    file.write(f"----------------------------\n")
+    file.write(f"Total Votes: {total_votes}\n")
+    file.write(f"----------------------------\n")
+    file.write(f"Charles Casper Stockham: {percent_stockham:.3f}% ({votes_stockham})\n")
+    file.write(f"Diana DeGette: {percent_degette:.3f}% ({votes_degette})\n")
+    file.write(f"Raymon Anthony Doane: {percent_doane:.3f}% ({votes_doane})\n")
+    file.write(f"----------------------------\n")
+    file.write(f"Winner: {winner}\n")
+    file.write(f"----------------------------\n")
